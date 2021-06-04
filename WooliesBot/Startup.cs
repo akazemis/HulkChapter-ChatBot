@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using CoreBot.Dialogs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.BotBuilderSamples.Bots;
 using Microsoft.BotBuilderSamples.Dialogs;
+using Microsoft.BotBuilderSamples.Recognizers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -33,9 +35,11 @@ namespace Microsoft.BotBuilderSamples
 
             // Register LUIS recognizer
             services.AddSingleton<FlightBookingRecognizer>();
+            services.AddSingleton<FindPromotionsRecognizer>();
 
             // Register the BookingDialog.
             services.AddSingleton<BookingDialog>();
+            services.AddSingleton<FindPromotionsDialog>();
 
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();

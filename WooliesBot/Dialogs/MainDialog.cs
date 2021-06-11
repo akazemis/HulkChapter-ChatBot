@@ -6,9 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreBot.CognitiveModels;
+using CoreBot.Dialogs;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
+using Microsoft.BotBuilderSamples.Recognizers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
@@ -17,17 +20,24 @@ namespace Microsoft.BotBuilderSamples.Dialogs
     public class MainDialog : ComponentDialog
     {
         private readonly FlightBookingRecognizer _luisRecognizer;
+        private readonly FindPromotionsRecognizer _luisFindPromotionsRecognizer;
         protected readonly ILogger Logger;
 
         // Dependency injection uses this constructor to instantiate MainDialog
-        public MainDialog(FlightBookingRecognizer luisRecognizer, BookingDialog bookingDialog, ILogger<MainDialog> logger)
+        public MainDialog(FlightBookingRecognizer luisRecognizer,
+                          FindPromotionsRecognizer luisFindPromotionsRecognizer,
+                          BookingDialog bookingDialog,
+                          FindPromotionsDialog findPromotionsDialog,
+                          ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
             _luisRecognizer = luisRecognizer;
+            _luisFindPromotionsRecognizer = luisFindPromotionsRecognizer;
             Logger = logger;
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(bookingDialog);
+            AddDialog(findPromotionsDialog);
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
@@ -65,10 +75,15 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             }
 
             // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
-            var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
-            switch (luisResult.TopIntent().intent)
+            //var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
+            var recognitionResult = await _luisFindPromotionsRecognizer.RecognizeAsync(stepContext.Context, cancellationToken);
+            var topIntent=  recognitionResult.GetTopScoringIntent();
+            var intent = Enum.Parse<Intent>(topIntent.intent);
+            
+            switch (intent)
             {
-                case FlightBooking.Intent.BookFlight:
+                case Intent.BookFlight:
+                    var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
                     await ShowWarningForUnsupportedCities(stepContext.Context, luisResult, cancellationToken);
 
                     // Initialize BookingDetails with any entities we may have found in the response.
@@ -83,16 +98,24 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                     // Run the BookingDialog giving it whatever details we have from the LUIS call, it will fill out the remainder.
                     return await stepContext.BeginDialogAsync(nameof(BookingDialog), bookingDetails, cancellationToken);
 
-                case FlightBooking.Intent.GetWeather:
+                case Intent.GetWeather:
                     // We haven't implemented the GetWeatherDialog so we just display a TODO message.
                     var getWeatherMessageText = "TODO: get weather flow here";
                     var getWeatherMessage = MessageFactory.Text(getWeatherMessageText, getWeatherMessageText, InputHints.IgnoringInput);
                     await stepContext.Context.SendActivityAsync(getWeatherMessage, cancellationToken);
                     break;
 
+                case Intent.FindProductOffers:
+                    var luisFindPromotionsResult = await _luisRecognizer.RecognizeAsync<FindPromotions>(stepContext.Context, cancellationToken);
+                    var findPromotionsDetails = new FindPromotions()
+                    {
+                        PointOfTime = luisFindPromotionsResult?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
+                    };
+                    return await stepContext.BeginDialogAsync(nameof(FindPromotionsDialog), findPromotionsDetails, cancellationToken);
+
                 default:
                     // Catch all for unhandled intents
-                    var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {luisResult.TopIntent().intent})";
+                    var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {intent})";
                     var didntUnderstandMessage = MessageFactory.Text(didntUnderstandMessageText, didntUnderstandMessageText, InputHints.IgnoringInput);
                     await stepContext.Context.SendActivityAsync(didntUnderstandMessage, cancellationToken);
                     break;

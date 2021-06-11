@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
+using CoreBot.CognitiveModels;
 
 namespace Microsoft.BotBuilderSamples
 {
@@ -15,12 +16,7 @@ namespace Microsoft.BotBuilderSamples
     {
         public string Text;
         public string AlteredText;
-        public enum Intent {
-            BookFlight,
-            Cancel,
-            GetWeather,
-            None
-        };
+        
         public Dictionary<Intent, IntentScore> Intents;
 
         public class _Entities

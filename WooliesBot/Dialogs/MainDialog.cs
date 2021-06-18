@@ -20,12 +20,12 @@ namespace Microsoft.BotBuilderSamples.Dialogs
     public class MainDialog : ComponentDialog
     {
         private readonly FlightBookingRecognizer _luisRecognizer;
-        private readonly FindPromotionsRecognizer _luisFindPromotionsRecognizer;
+        private readonly WooliesXChatbotRecognizer _luisWooliesXChatbotRecognizer;
         protected readonly ILogger Logger;
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(FlightBookingRecognizer luisRecognizer,
-                          FindPromotionsRecognizer luisFindPromotionsRecognizer,
+                          WooliesXChatbotRecognizer luisWooliesXChatbotRecognizer,
                           BookingDialog bookingDialog,
                           FindPromotionsDialog findPromotionsDialog,
                           GetShoppingListDialog getShoppingListDialog,
@@ -33,7 +33,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             : base(nameof(MainDialog))
         {
             _luisRecognizer = luisRecognizer;
-            _luisFindPromotionsRecognizer = luisFindPromotionsRecognizer;
+            _luisWooliesXChatbotRecognizer = luisWooliesXChatbotRecognizer;
             Logger = logger;
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
@@ -78,7 +78,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
 
             // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
             //var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
-            var recognitionResult = await _luisFindPromotionsRecognizer.RecognizeAsync(stepContext.Context, cancellationToken);
+            var recognitionResult = await _luisWooliesXChatbotRecognizer.RecognizeAsync(stepContext.Context, cancellationToken);
             var topIntent=  recognitionResult.GetTopScoringIntent();
             var intent = Enum.Parse<Intent>(topIntent.intent);
             

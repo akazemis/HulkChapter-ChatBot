@@ -28,6 +28,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                           FindPromotionsRecognizer luisFindPromotionsRecognizer,
                           BookingDialog bookingDialog,
                           FindPromotionsDialog findPromotionsDialog,
+                          GetShoppingListDialog getShoppingListDialog,
                           ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -38,6 +39,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(bookingDialog);
             AddDialog(findPromotionsDialog);
+            AddDialog(getShoppingListDialog);
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
@@ -112,6 +114,14 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                         PointOfTime = luisFindPromotionsResult?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
                     };
                     return await stepContext.BeginDialogAsync(nameof(FindPromotionsDialog), findPromotionsDetails, cancellationToken);
+
+                case Intent.GetRequiredProductList:
+                    var result = await _luisRecognizer.RecognizeAsync<GetShoppingList>(stepContext.Context, cancellationToken);
+                    var products = new GetShoppingList()
+                    {
+                        PointOfTime = result?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
+                    };
+                    return await stepContext.BeginDialogAsync(nameof(GetShoppingListDialog), products, cancellationToken);
 
                 default:
                     // Catch all for unhandled intents

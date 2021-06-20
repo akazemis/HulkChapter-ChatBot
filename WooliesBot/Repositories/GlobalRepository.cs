@@ -1,7 +1,5 @@
 ﻿using CoreBot.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CoreBot.Repositories
@@ -23,6 +21,25 @@ namespace CoreBot.Repositories
                     ProductId = "2",
                     ProductTitle = "Potato Chips",
                     PromotionDescription = "Buy 2 get 1 free"
+                }
+            };
+        }
+
+        public async Task<List<Product>> GetShoppingList(string pointOfTime)
+        {
+            return new List<Product>()
+            {
+                new Product()
+                {
+                    Id = "1",
+                    Title = "Lor Coffee",
+                    Description = "Lor Coffee Pod"
+                },
+                new Product()
+                {
+                    Id = "2",
+                    Title = "Potato Chips",
+                    Description = "Smiths Potato Chip"
                 }
             };
         }

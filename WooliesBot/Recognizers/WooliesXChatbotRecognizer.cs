@@ -6,11 +6,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.BotBuilderSamples.Recognizers
 {
-    public class FindPromotionsRecognizer : IRecognizer
+    public class WooliesXChatbotRecognizer : IRecognizer
     {
         private readonly LuisRecognizer _recognizer;
 
-        public FindPromotionsRecognizer(IConfiguration configuration)
+        public WooliesXChatbotRecognizer(IConfiguration configuration)
         {
             var luisIsConfigured = !string.IsNullOrEmpty(configuration["LuisAppId"]) && !string.IsNullOrEmpty(configuration["LuisAPIKey"]) && !string.IsNullOrEmpty(configuration["LuisAPIHostName"]);
             if (luisIsConfigured)

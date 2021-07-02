@@ -45,7 +45,8 @@ namespace Microsoft.BotBuilderSamples
             services.AddSingleton<ShowTrolleyDialog>();
             services.AddSingleton<GetShoppingListDialog>();
             services.AddSingleton<AddItemToTrolleyDialog>();
-
+            services.AddSingleton<AddItemsInShoppingListToTrolleyDialog>();
+			
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();
 

@@ -21,11 +21,12 @@ namespace CoreBot.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 PointOfTimeStepAsync,
-                FinalStepAsync
+                GetShoppingListStepAsync
             }));
             InitialDialogId = nameof(WaterfallDialog);
             _repository = repository;
         }
+        
         private async Task<DialogTurnResult> PointOfTimeStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var shoppingList = (GetShoppingList)stepContext.Options;
@@ -38,9 +39,8 @@ namespace CoreBot.Dialogs
             return await stepContext.NextAsync(shoppingList, cancellationToken);
         }
 
-        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> GetShoppingListStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
             var shoppingList = (GetShoppingList)stepContext.Options;
             var messageText = $"These products are in your shopping list {shoppingList.PointOfTime}:{LineBreak}" + await GetShoppingList(shoppingList.PointOfTime);
 
@@ -54,7 +54,7 @@ namespace CoreBot.Dialogs
         {
             var products = await _repository.GetShoppingList(pointOfTime);
             var result = string.Join(LineBreak,
-                products.Select(p => $"{p.Title} ({p.Description})"));
+                products.Select(p => $"{p.ProductName} ({p.Quantity} x ${p.UnitPrice})"));
             return result;
         }
     }

@@ -7,6 +7,31 @@ namespace CoreBot.Repositories
 {
     public class GlobalRepository : IGlobalRepository
     {
+        private List<TrolleyItem> _shoppingList;
+
+        public GlobalRepository()
+        {
+            _shoppingList = new List<TrolleyItem>()
+            {
+                new TrolleyItem()
+                {
+                    ProductId = "1",
+                    ProductName = "Lor Coffee",
+                    UnitOfMeasure = "1",
+                    UnitPrice = 3,
+                    Quantity = 2
+                },
+                new TrolleyItem()
+                {
+                    ProductId = "2",
+                    ProductName = "Potato Chips",
+                    UnitOfMeasure = "1",
+                    UnitPrice = 4,
+                    Quantity = 3
+                }
+            };
+        }
+        
         public async Task<List<ProductPromotion>> GetProductPromotions(string pointOfTime)
         {
             return new List<ProductPromotion>()
@@ -41,23 +66,9 @@ namespace CoreBot.Repositories
         }
 
 
-        public async Task<List<Product>> GetShoppingList(string pointOfTime)
+        public async Task<List<TrolleyItem>> GetShoppingList(string pointOfTime)
         {
-            return new List<Product>()
-            {
-                new Product()
-                {
-                    Id = "1",
-                    Title = "Lor Coffee",
-                    Description = "Lor Coffee Pod"
-                },
-                new Product()
-                {
-                    Id = "2",
-                    Title = "Potato Chips",
-                    Description = "Smiths Potato Chip"
-                }
-            };
+            return _shoppingList;
         }
 
         public async Task RemoveTrolleyItem(string userId, string productName)

@@ -6,6 +6,8 @@
         Cancel,
         GetWeather,
         None,
-        FindProductOffers
+        FindProductOffers,
+        AddItemToTrolley,
+        ShowTrolley
     };
 }

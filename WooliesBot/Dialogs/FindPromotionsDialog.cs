@@ -2,8 +2,10 @@
 using CoreBot.Repositories;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.BotBuilderSamples.Dialogs;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +20,7 @@ namespace CoreBot.Dialogs
         public FindPromotionsDialog(IGlobalRepository repository) : base(nameof(FindPromotionsDialog))
         {
             AddDialog(new TextPrompt(nameof(TextPrompt)));
+            AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 PointOfTimeStepAsync,
@@ -40,12 +43,11 @@ namespace CoreBot.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-
             var promotionDetails = (FindPromotions)stepContext.Options;
-            var messageText = $"These products are on promotion {promotionDetails.PointOfTime}:{LineBreak}" + await GetProductPromotions(promotionDetails.PointOfTime);
-
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
-            await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
+            var promotionListMessage = await GetProductPromotions(promotionDetails.PointOfTime);
+            var messageText = $"These products are on promotion {promotionDetails.PointOfTime}:{LineBreak}{promotionListMessage}" ;
+            var promptMessage = MessageFactory.Text(messageText, InputHints.IgnoringInput);
+            await stepContext.PromptAsync(nameof(ChoicePrompt), new PromptOptions { Prompt = promptMessage, Choices = new List<Choice>()  { } }, cancellationToken) ;
             return await stepContext.EndDialogAsync(promotionDetails, cancellationToken);
 
         }

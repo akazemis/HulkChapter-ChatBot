@@ -8,6 +8,7 @@ namespace CoreBot.Repositories
     {
         Task<List<ProductPromotion>> GetProductPromotions(string pointOfTime);
 
+        Task<List<Product>> GetShoppingList(string pointOfTime);
         Task<List<TrolleyItem>> GetTrolleyItems(string userId);
 
         Task<List<Product>> GetAllProducts();

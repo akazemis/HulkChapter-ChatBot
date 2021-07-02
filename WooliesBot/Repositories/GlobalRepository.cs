@@ -1,8 +1,6 @@
 ﻿using CoreBot.Models;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CoreBot.Repositories
@@ -43,6 +41,21 @@ namespace CoreBot.Repositories
         }
 
 
+        public async Task<List<Product>> GetShoppingList(string pointOfTime)
+        {
+            return new List<Product>()
+            {
+                new Product()
+                {
+                    Id = "1",
+                    Title = "Lor Coffee",
+                    Description = "Lor Coffee Pod"
+                },
+                new Product()
+                {
+                    Id = "2",
+                    Title = "Potato Chips",
+                    Description = "Smiths Potato Chip"
 
         public async Task RemoveTrolleyItem(string userId, string productName)
         {

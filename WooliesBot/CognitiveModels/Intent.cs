@@ -7,6 +7,8 @@
         GetWeather,
         None,
         FindProductOffers,
-        GetRequiredProductList
+        AddItemToTrolley,
+        GetRequiredProductList,
+        ShowTrolley
     };
 }

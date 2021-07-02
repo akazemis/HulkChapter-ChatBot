@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreBot.CognitiveModels;
 using CoreBot.Dialogs;
+using CoreBot.LuisHelpers;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
@@ -20,26 +21,38 @@ namespace Microsoft.BotBuilderSamples.Dialogs
     public class MainDialog : ComponentDialog
     {
         private readonly FlightBookingRecognizer _luisRecognizer;
+        private readonly GenericRecognizer _luisGenericRecognizer;
         private readonly WooliesXChatbotRecognizer _luisWooliesXChatbotRecognizer;
+        private readonly ShowTrolleyDialog _showTrolleyDialog;
+        private readonly AddItemToTrolleyDialog _addItemToTrolleyDialog;
         protected readonly ILogger Logger;
+        const string LineBreak = "\r\n";
 
         // Dependency injection uses this constructor to instantiate MainDialog
         public MainDialog(FlightBookingRecognizer luisRecognizer,
+                          GenericRecognizer luisGenericRecognizer,
                           WooliesXChatbotRecognizer luisWooliesXChatbotRecognizer,
                           BookingDialog bookingDialog,
                           FindPromotionsDialog findPromotionsDialog,
+                          ShowTrolleyDialog showTrolleyDialog,
                           GetShoppingListDialog getShoppingListDialog,
+                          AddItemToTrolleyDialog addItemToTrolleyDialog,
                           ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
             _luisRecognizer = luisRecognizer;
+            _luisGenericRecognizer = luisGenericRecognizer;
             _luisWooliesXChatbotRecognizer = luisWooliesXChatbotRecognizer;
+            _showTrolleyDialog = showTrolleyDialog;
+            _addItemToTrolleyDialog = addItemToTrolleyDialog;
             Logger = logger;
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(bookingDialog);
             AddDialog(findPromotionsDialog);
+            AddDialog(showTrolleyDialog);
             AddDialog(getShoppingListDialog);
+            AddDialog(addItemToTrolleyDialog);
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
@@ -78,10 +91,9 @@ namespace Microsoft.BotBuilderSamples.Dialogs
 
             // Call LUIS and gather any potential booking details. (Note the TurnContext has the response to the prompt.)
             //var luisResult = await _luisRecognizer.RecognizeAsync<FlightBooking>(stepContext.Context, cancellationToken);
+            var intent = await IntentHelper.GetIntent(_luisGenericRecognizer, stepContext.Context, cancellationToken);
             var recognitionResult = await _luisWooliesXChatbotRecognizer.RecognizeAsync(stepContext.Context, cancellationToken);
-            var topIntent=  recognitionResult.GetTopScoringIntent();
-            var intent = Enum.Parse<Intent>(topIntent.intent);
-            
+
             switch (intent)
             {
                 case Intent.BookFlight:
@@ -114,6 +126,10 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                         PointOfTime = luisFindPromotionsResult?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
                     };
                     return await stepContext.BeginDialogAsync(nameof(FindPromotionsDialog), findPromotionsDetails, cancellationToken);
+                case Intent.AddItemToTrolley:
+                    return await stepContext.BeginDialogAsync(nameof(AddItemToTrolleyDialog));
+                case Intent.ShowTrolley:
+                    return await stepContext.BeginDialogAsync(nameof(ShowTrolleyDialog));
 
                 case Intent.GetRequiredProductList:
                     var result = await _luisRecognizer.RecognizeAsync<GetShoppingList>(stepContext.Context, cancellationToken);
@@ -122,7 +138,6 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                         PointOfTime = result?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
                     };
                     return await stepContext.BeginDialogAsync(nameof(GetShoppingListDialog), products, cancellationToken);
-
                 default:
                     // Catch all for unhandled intents
                     var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {intent})";

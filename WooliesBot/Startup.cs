@@ -36,12 +36,15 @@ namespace Microsoft.BotBuilderSamples
 
             // Register LUIS recognizer
             services.AddSingleton<FlightBookingRecognizer>();
+            services.AddSingleton<GenericRecognizer>();
             services.AddSingleton<WooliesXChatbotRecognizer>();
 
             // Register the BookingDialog.
             services.AddSingleton<BookingDialog>();
             services.AddSingleton<FindPromotionsDialog>();
+            services.AddSingleton<ShowTrolleyDialog>();
             services.AddSingleton<GetShoppingListDialog>();
+            services.AddSingleton<AddItemToTrolleyDialog>();
 
             // The MainDialog that will be run by the bot.
             services.AddSingleton<MainDialog>();

@@ -46,7 +46,7 @@ namespace CoreBot.Dialogs
         private async Task<string> AddItemToTrolleyAndGetMessage(string userId, AddItemToTrolley addItemToTrolley)
         {
             var currentTrolleyItems = await _repository.GetTrolleyItems(userId);
-            var trolleyItemToBeAdded = addItemToTrolley?.TrolleyItemX;
+            var trolleyItemToBeAdded = addItemToTrolley.TrolleyItemX;
             var products = await _repository.GetAllProducts();
             if(trolleyItemToBeAdded?.ProductName == null)
             {
@@ -58,9 +58,9 @@ namespace CoreBot.Dialogs
                 return "Item not found.";
             }
             var qty = 1m;
-            if (string.IsNullOrWhiteSpace(trolleyItemToBeAdded?.ProductQuantity))
+            if (string.IsNullOrWhiteSpace(addItemToTrolley?.Quantity))
             {
-                qty = decimal.Parse(trolleyItemToBeAdded?.ProductQuantity);
+                qty = decimal.Parse(addItemToTrolley?.Quantity);
             }
             currentTrolleyItems.Add(new Models.TrolleyItem() 
             {

@@ -56,6 +56,9 @@ namespace CoreBot.Repositories
                     Id = "2",
                     Title = "Potato Chips",
                     Description = "Smiths Potato Chip"
+                }
+            };
+        }
 
         public async Task RemoveTrolleyItem(string userId, string productName)
         {

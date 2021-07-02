@@ -8,7 +8,7 @@
         None,
         FindProductOffers,
         AddItemToTrolley,
-        GetRequiredProductList
+        GetRequiredProductList,
         ShowTrolley
     };
 }

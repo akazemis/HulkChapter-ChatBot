@@ -9,6 +9,7 @@
         FindProductOffers,
         AddItemToTrolley,
         GetRequiredProductList,
-        ShowTrolley
+        ShowTrolley,
+        AddItemsInShoppingListToTrolley
     };
 }

@@ -36,7 +36,8 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                           FindPromotionsDialog findPromotionsDialog,
                           ShowTrolleyDialog showTrolleyDialog,
                           GetShoppingListDialog getShoppingListDialog,
-                          AddItemToTrolleyDialog addItemToTrolleyDialog,
+                          AddItemToTrolleyDialog addItemToTrolleyDialog,			  
+                          AddItemsInShoppingListToTrolleyDialog addItemsInShoppingListToTrolleyDialog,
                           ILogger<MainDialog> logger)
             : base(nameof(MainDialog))
         {
@@ -53,6 +54,7 @@ namespace Microsoft.BotBuilderSamples.Dialogs
             AddDialog(showTrolleyDialog);
             AddDialog(getShoppingListDialog);
             AddDialog(addItemToTrolleyDialog);
+            AddDialog(addItemsInShoppingListToTrolleyDialog);
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
@@ -126,8 +128,10 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                         PointOfTime = luisFindPromotionsResult?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
                     };
                     return await stepContext.BeginDialogAsync(nameof(FindPromotionsDialog), findPromotionsDetails, cancellationToken);
+                
                 case Intent.AddItemToTrolley:
                     return await stepContext.BeginDialogAsync(nameof(AddItemToTrolleyDialog));
+                
                 case Intent.ShowTrolley:
                     return await stepContext.BeginDialogAsync(nameof(ShowTrolleyDialog));
 
@@ -138,6 +142,10 @@ namespace Microsoft.BotBuilderSamples.Dialogs
                         PointOfTime = result?.Entities?.PointOfTime?.FirstOrDefault() ?? "Now"
                     };
                     return await stepContext.BeginDialogAsync(nameof(GetShoppingListDialog), products, cancellationToken);
+					
+                case Intent.AddItemsInShoppingListToTrolley:
+                    return await stepContext.BeginDialogAsync(nameof(AddItemsInShoppingListToTrolleyDialog));
+
                 default:
                     // Catch all for unhandled intents
                     var didntUnderstandMessageText = $"Sorry, I didn't get that. Please try asking in a different way (intent was {intent})";
